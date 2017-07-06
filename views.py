@@ -12,7 +12,8 @@ from geoserver.catalog import Catalog
 @login_required
 def index(request):
     context = {
-        "v": __version__
+        "v": __version__,
+        "APP_NAME": APP_NAME
     }
     return render(request, "%s/index.html" % APP_NAME, context)
 
@@ -85,15 +86,13 @@ def geoserver_rest_proxy(request, suburl):
 
     requests_args['headers'] = headers
 
-
     response = requests.request(request.method, url, auth=(username, password), stream=True, **requests_args)
     kwargs = dict(status=response.status_code)
     if "Content-Type" in response.headers:
         kwargs["content_type"] = response.headers["Content-Type"]
     proxy_response = HttpResponse(response.content, **kwargs)
-
-
     return proxy_response
+
 
 def get_headers(environ):
     """

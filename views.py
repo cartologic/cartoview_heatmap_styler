@@ -1,4 +1,6 @@
 import json
+import random
+import string
 import requests
 from django.shortcuts import render, HttpResponse
 from django.contrib.auth.decorators import login_required
@@ -14,13 +16,14 @@ def index(request):
     context = {
         "v": __version__,
         "APP_NAME": APP_NAME,
-        'username': request.user
+        'username': request.user,
     }
     return render(request, "%s/index.html" % APP_NAME, context)
 
 @login_required
 def layer_styles(request, layername):
-    layer = _resolve_layer(request, layername, 'base.view_resourcebase')
+    # layer = _resolve_layer(request, layername, 'base.view_resourcebase')
+    layer = _resolve_layer(request, layername, 'layers.change_layer_style')
     styles = []
     for style in layer.styles.all():
         styles.append({
@@ -39,7 +42,7 @@ def save_style(request, layer_name, style_name):
     layer = _resolve_layer(
         request,
         layer_name,
-        'base.change_resourcebase',
+        'layers.change_layer_style',
         _PERMISSION_MSG_MODIFY)
     res = dict(success=True)
     # try:
@@ -87,13 +90,15 @@ def geoserver_rest_proxy(request, suburl):
 
     requests_args['headers'] = headers
 
+
     response = requests.request(request.method, url, auth=(username, password), stream=True, **requests_args)
     kwargs = dict(status=response.status_code)
     if "Content-Type" in response.headers:
         kwargs["content_type"] = response.headers["Content-Type"]
     proxy_response = HttpResponse(response.content, **kwargs)
-    return proxy_response
 
+
+    return proxy_response
 
 def get_headers(environ):
     """

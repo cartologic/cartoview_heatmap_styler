@@ -7,7 +7,7 @@ import t from 'tcomb-form'
 const alphaNumericRegex = /(^[a-zA-Z][a-zA-Z0-9_]*)|(^[_][a-zA-Z0-9_]+$)/
 const Form = t.form.Form
 const AlphaNumeric = t.refinement(t.String, (n) => {
-    if (n.match(alphaNumericRegex)) {
+    if (n.match(alphaNumericRegex ) && n.length < 200) {
         return true
     } else {
         return false
@@ -18,7 +18,9 @@ AlphaNumeric.getValidationErrorMessage = (value) => {
         return 'Required'
     } else if (!value.match(alphaNumericRegex)) {
         return 'Only (AlphaNumeric,_) Allowed and numbers not allowed as prefix'
-    }
+    }  else if ( value.length >200) {
+        return 'Style name is too long'
+    } 
 }
 
 const formSchema = t.struct({

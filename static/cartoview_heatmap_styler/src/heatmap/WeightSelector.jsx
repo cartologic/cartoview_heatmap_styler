@@ -20,7 +20,7 @@ export class AttributeSelector extends Component {
             selectedAttribute: a.attribute,
             selectedIndex: i
         }, () => {
-            this.props.selectAttribute( a )
+            this.props.selectAttribute( a.attribute )
         } )
     }
     render() {

@@ -35,9 +35,16 @@ export default class HeatmapConfigForm extends Component {
         <div className="form-group">
           <label>{"Radius"}</label>
           <br></br>
-          <input type="number" className="form-control" id="radius" value={config.radius} onChange={e => onChange({
+          <input type="number" className="form-control" id="radius" value={config.radius} 
+          onChange={(e)=> {
+            if(e.target.value.length>4){
+              e.target.value= config.radius
+          }
+            onChange({
             radius: parseInt(e.target.value)
-          })} />
+          })}}
+          
+          />
         </div>
         <br></br>
 

@@ -35,7 +35,7 @@
     proxy: PROXY_URL,
     rest:appManagerRest,
     layersAPI:"{% url 'api_dispatch_list' api_name='api' resource_name='layers' %}",
-    stylesUrl: "{% url 'cartoview_heatmap_styler.index' %}styles",
+    stylesUrl: "{% url 'heatmap_styler.index' %}styles",
     {% if 'access_token' in request.session %}
         wfsURL : "{{ GEOSERVER_BASE_URL }}wfs?access_token={{request.session.access_token}}",
         wmsURL : "{{ GEOSERVER_BASE_URL }}wms?access_token={{request.session.access_token}}",
@@ -54,11 +54,11 @@
   const username = '{{username}}'
 </script>
 
-  <script src="{{ STATIC_URL }}cartoview_heatmap_styler/ol.js"></script>
-  <script src="{{ STATIC_URL }}cartoview_heatmap_styler/OpenLayers.js"></script>
-  <script src="{{ STATIC_URL }}cartoview_heatmap_styler/dist/commons.js?v={{v}}"></script>
-  <script src="{{ STATIC_URL }}cartoview_heatmap_styler/dist/Styler.bundle.js?v={{v}}"></script>
-  <!-- <script src="{{ STATIC_URL }}cartoview_categorized_styler/categorized-styler.bundle.min.js?v={{v}}"></script> -->
+  <script src="{{ STATIC_URL }}heatmap_styler/ol.js"></script>
+  <script src="{{ STATIC_URL }}heatmap_styler/OpenLayers.js"></script>
+  <script src="{{ STATIC_URL }}heatmap_styler/dist/commons.js?v={{v}}"></script>
+  <script src="{{ STATIC_URL }}heatmap_styler/dist/Styler.bundle.js?v={{v}}"></script>
+  <!-- <script src="{{ STATIC_URL }}categorized_styler/categorized-styler.bundle.min.js?v={{v}}"></script> -->
   
   <script type="text/javascript">
     var viewer= new Viewer("styler-ct",username,URLS)

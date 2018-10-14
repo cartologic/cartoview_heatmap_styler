@@ -15,7 +15,7 @@ class URLS {
             'limit': limit,
             'offset': offset,
             'permission':"change_layer_style",
-            'type':'point',
+            'geom_type':'point',
             ...query
         }
         if (userMaps) {

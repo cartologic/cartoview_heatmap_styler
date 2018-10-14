@@ -77,7 +77,7 @@ class WMSClient {
         resolve(layer);
       })
     }
-    const url = URLS.rest + "geonodelayer/?typename=" + layerName;
+    const url = URLS.layersAPI + "?typename=" + layerName;
     return fetch(url, {
       credentials: 'include',
     }).then(res=>res.json()).then((res) => {

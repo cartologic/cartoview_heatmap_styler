@@ -35,7 +35,7 @@ def layer_styles(request, layername):
 
 
 username, password = ogc_server_settings.credentials
-gs_catalog = Catalog(ogc_server_settings.internal_rest, username, password)
+gs_catalog = Catalog(ogc_server_settings.internal_rest, username, password, disable_ssl_certificate_validation=True)
 
 @login_required
 def save_style(request, layer_name, style_name):

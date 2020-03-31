@@ -1,15 +1,16 @@
 import json
-import random
-import string
-import requests
-from django.shortcuts import render, HttpResponse
-from django.contrib.auth.decorators import login_required
-from . import APP_NAME, __version__
 
-from geonode.layers.views import _resolve_layer, _PERMISSION_MSG_MODIFY
+import requests
+from django.contrib.auth.decorators import login_required
+from django.http import QueryDict, JsonResponse
+from django.shortcuts import render, HttpResponse
 from geonode.geoserver.helpers import ogc_server_settings, set_styles
-from django.http import QueryDict
+from geonode.layers.views import _resolve_layer, _PERMISSION_MSG_MODIFY
 from geoserver.catalog import Catalog
+
+from . import APP_NAME, __version__
+from .repeat import repeat_every
+
 
 @login_required
 def index(request):
@@ -19,6 +20,7 @@ def index(request):
         'username': request.user,
     }
     return render(request, "%s/index.html" % APP_NAME, context)
+
 
 @login_required
 def layer_styles(request, layername):
@@ -35,7 +37,8 @@ def layer_styles(request, layername):
 
 
 username, password = ogc_server_settings.credentials
-gs_catalog = Catalog(ogc_server_settings.internal_rest, username, password)
+gs_catalog = Catalog(ogc_server_settings.rest, username, password)
+
 
 @login_required
 def save_style(request, layer_name, style_name):
@@ -44,24 +47,28 @@ def save_style(request, layer_name, style_name):
         layer_name,
         'layers.change_layer_style',
         _PERMISSION_MSG_MODIFY)
-    res = dict(success=True)
-    # try:
-    style = gs_catalog.get_style(style_name)
+    workspace_name = layer_name.split(":")[0]
+    # get style of geoserver
+    style_func = repeat_every()(gs_catalog.get_style)
+    style = style_func(style_name, workspace_name)
+    # check if new style
     new = style is None
     xml = request.body
-    gs_catalog.create_style(style_name, xml, True,workspace=layer_name.split(":")[0])
+    gs_catalog.create_style(style_name, xml, True, workspace=layer_name.split(":")[0])
     if new:
-        style = gs_catalog.get_style(style_name,workspace=layer_name.split(":")[0])
         gs_layer = gs_catalog.get_layer(layer_name)
-        gs_layer.styles += [style,]
+        style_func = repeat_every()(gs_catalog.get_style)
+        style = style_func(style_name, workspace_name)
+        gs_layer.styles += [style, ]
         gs_catalog.save(gs_layer)
     set_styles(layer, gs_catalog)
-    # except:
-    #     res["success"] = False
-    return HttpResponse(json.dumps(res), content_type="text/json")
+    return JsonResponse({"success": True}, status=200)
 
-#gs_catalog = Catalog(ogc_server_settings.internal_rest, username, password)
+
+# gs_catalog = Catalog(ogc_server_settings.internal_rest, username, password)
 from django.views.decorators.csrf import csrf_exempt
+
+
 @csrf_exempt
 @login_required
 def geoserver_rest_proxy(request, suburl):
@@ -73,7 +80,6 @@ def geoserver_rest_proxy(request, suburl):
 
     requests_args['headers'] = {}
     requests_args['data'] = request.body
-
 
     # Overwrite any headers and params from the incoming request with explicitly
     # specified values for the requests library.
@@ -90,15 +96,14 @@ def geoserver_rest_proxy(request, suburl):
 
     requests_args['headers'] = headers
 
-
     response = requests.request(request.method, url, auth=(username, password), stream=True, **requests_args)
     kwargs = dict(status=response.status_code)
     if "Content-Type" in response.headers:
         kwargs["content_type"] = response.headers["Content-Type"]
     proxy_response = HttpResponse(response.content, **kwargs)
 
-
     return proxy_response
+
 
 def get_headers(environ):
     """

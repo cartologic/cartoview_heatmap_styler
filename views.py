@@ -9,7 +9,7 @@ from geonode.layers.views import _resolve_layer, _PERMISSION_MSG_MODIFY
 from geoserver.catalog import Catalog
 
 from . import APP_NAME, __version__
-from .repeat import repeat_every
+from .utils import repeat_every
 
 
 @login_required

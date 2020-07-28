@@ -2,8 +2,8 @@ import json
 
 import requests
 from django.contrib.auth.decorators import login_required
-from django.http import QueryDict, JsonResponse
-from django.shortcuts import render, HttpResponse
+from django.http import QueryDict, JsonResponse, HttpResponse
+from django.shortcuts import render
 from geonode.geoserver.helpers import ogc_server_settings, set_styles
 from geonode.layers.views import _resolve_layer, _PERMISSION_MSG_MODIFY
 from geoserver.catalog import Catalog
@@ -111,7 +111,7 @@ def get_headers(environ):
     https://docs.djangoproject.com/en/dev/ref/request-response/#django.http.HttpRequest.META
     """
     headers = {}
-    for key, value in environ.iteritems():
+    for key, value in environ.items():
         # Sometimes, things don't like when you send the requesting host through.
         if key.startswith('HTTP_') and key != 'HTTP_HOST':
             headers[key[5:].replace('_', '-')] = value
